@@ -103,8 +103,8 @@ def game1():
         presenty = random.randrange(-480, 0)
         presentbox = pygame.draw.rect(screen, RED, [presentx, presenty, 30, 30])
         present_boxes.append([presentbox, presentx, presenty])
-    click = False
     grab = False
+    boxhold = False
     while True:
         mx, my = pygame.mouse.get_pos()
 
@@ -113,15 +113,14 @@ def game1():
                 
         for present in present_boxes:
             present[2] += 1
-            present[0] = pygame.draw.rect(screen, RED, [present[1], present[2], 30, 30])
-            pygame.draw.rect(screen, GREEN, [present[1]+10, present[2], 10, 30])
-            pygame.draw.rect(screen, GREEN, [present[1], present[2]+10, 30, 10])
-            if present[0].collidepoint((mx, my)) and click:
-                grab = True
-            if grab:
-                present[0] = pygame.draw.rect(screen, RED, [mx, my, 30, 30])
-                pygame.draw.rect(screen, GREEN, [present[1]+10, present[2], 10, 30])
-                pygame.draw.rect(screen, GREEN, [present[1], present[2]+10, 30, 10])
+            present[0] = pygame.draw.rect(screen, RED, [present[1], present[2], 40, 40])
+            pygame.draw.rect(screen, GREEN, [present[1]+15, present[2], 10, 40])
+            pygame.draw.rect(screen, GREEN, [present[1], present[2]+15, 40, 10])
+            if present[0].collidepoint((mx, my)) and grab:
+                boxhold = True
+            if boxhold:
+                present[1] = mx-10
+                present[2] = my-10
         # for present in present_boxes:
         #     if grab:
         #         present[1: ] = mx, my
@@ -150,7 +149,7 @@ def game1():
                     pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    click = True
+                    grab = True
                 print(True)
             if event.type == pygame.MOUSEBUTTONUP:
                 grab = False
