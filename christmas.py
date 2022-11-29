@@ -11,6 +11,10 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
+presentbox = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\presentbox.png")
+presentbox = pygame.transform.scale(presentbox, (50,50))
+santabag = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\santabag.png")
+santabag = pygame.transform.scale(santabag, (100,100))
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (155, 0, 0)
@@ -100,27 +104,28 @@ def game1():
     present_boxes = []
     for i in range(20):
         presentx = random.randrange(0, 610)
-        presenty = random.randrange(-480, 0)
-        presentbox = pygame.draw.rect(screen, RED, [presentx, presenty, 30, 30])
-        present_boxes.append([presentbox, presentx, presenty])
+        presenty = random.randrange(-960, 0)
+
+        present_boxes.append([None, presentx, presenty])
     grab = False
     boxhold = False
     while True:
-        mx, my = pygame.mouse.get_pos()
-
         screen.fill(BLACK)
         snowfall()
                 
+            
         for present in present_boxes:
+            # boxhold = False
             present[2] += 1
-            present[0] = pygame.draw.rect(screen, RED, [present[1], present[2], 40, 40])
-            pygame.draw.rect(screen, GREEN, [present[1]+15, present[2], 10, 40])
-            pygame.draw.rect(screen, GREEN, [present[1], present[2]+15, 40, 10])
-            if present[0].collidepoint((mx, my)) and grab:
-                boxhold = True
-            if boxhold:
-                present[1] = mx-10
-                present[2] = my-10
+            present[0] = screen.blit(presentbox, (present[1], present[2]))
+
+        bag = screen.blit(santabag, (100, 100))
+
+        # for present in present_boxes:
+        #     if present[0].collidepoint((bag)):
+        #         boxhold = True
+        #     if boxhold:
+                
         # for present in present_boxes:
         #     if grab:
         #         present[1: ] = mx, my
@@ -147,13 +152,6 @@ def game1():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    grab = True
-                print(True)
-            if event.type == pygame.MOUSEBUTTONUP:
-                grab = False
-                print(False)
 
         pygame.display.update()
         clock.tick(30)
