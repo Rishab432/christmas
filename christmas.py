@@ -12,65 +12,17 @@ screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
 presentbox = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\presentbox.png")
-presentbox = pygame.transform.scale(presentbox, (50,50))
+presentbox = pygame.transform.scale(presentbox, (50, 50))
 santabag = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\santabag.png")
-santabag = pygame.transform.scale(santabag, (100,100))
+santabag = pygame.transform.scale(santabag, (90, 90))
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (155, 0, 0)
 GREEN = (0, 155, 0)
 BLUE = (0, 0, 255)
 
-def snowspeed(x, z):
-    if z == 1:
-        movex = round(random.uniform(0.2, 0.5), 1)
-        movey = round(random.uniform(0.7, 1.3), 1)
-        right_limit = x + 4
-        left_limit = x - 4
-    elif z == 2:
-        movex = round(random.uniform(0.5, 0.8), 1)
-        movey = round(random.uniform(1.3, 1.9), 1)
-        right_limit = x + 7
-        left_limit = x - 7
-    else:
-        movex = round(random.uniform(0.8, 1.1), 1)
-        movey = round(random.uniform(1.9, 2.5), 1)
-        right_limit = x + 10
-        left_limit = x - 10
-    return right_limit, left_limit, movex, movey
-
-def snowfall():
-    global back_snow, middle_snow
-    for item in back_snow:
-        if item[0] > item[3]:
-            item[5] = -abs(item[5])
-        elif item[0] < item[4]:
-            item[5] = abs(item[5])
-        item[0] += item[5]
-        item[1] += item[6]
-        pygame.draw.circle(screen, (105, 105, 105), item[0:2], item[2])
-        if item[1] > 480:
-            item[0] = random.randrange(-10, 650)
-            item[1] = random.randrange(-480, 0)
-    for item in middle_snow:
-        if item[0] > item[3]:
-            item[5] = -abs(item[5])
-        elif item[0] < item[4]:
-            item[5] = abs(item[5])
-        item[0] += item[5]
-        item[1] += item[6]
-        pygame.draw.circle(screen, (170, 170, 170), item[0:2], item[2])
-        if item[1] > 480:
-            item[0] = random.randrange(-10, 650)
-            item[1] = random.randrange(-480, 0)
-
-
-
-""" 
-The goal of the game is to catch as many falling presents as possible and for each catch you get a certain amount of points, if you reach the points needed you will win the game.
-"""
-def game1():
-    global back_snow, middle_snow
+def moving_objs():
+    global back_snow, middle_snow, front_snow, present_boxes
     back_snow = []
     for i in range (150):
         bx = random.randrange(-10, 650)
@@ -103,49 +55,113 @@ def game1():
         front_snow.append([fx, fy, fz, frlimit, fllimit, f_mvx, f_mvy])
     present_boxes = []
     for i in range(20):
-        presentx = random.randrange(0, 610)
+        presentx = random.randrange(0, 590)
         presenty = random.randrange(-960, 0)
-
         present_boxes.append([None, presentx, presenty])
-    grab = False
-    boxhold = False
+
+def snowspeed(x, z):
+    if z == 1:
+        movex = round(random.uniform(0.2, 0.5), 1)
+        movey = round(random.uniform(0.7, 1.3), 1)
+        right_limit = x + 4
+        left_limit = x - 4
+    elif z == 2:
+        movex = round(random.uniform(0.5, 0.8), 1)
+        movey = round(random.uniform(1.3, 1.9), 1)
+        right_limit = x + 7
+        left_limit = x - 7
+    else:
+        movex = round(random.uniform(0.8, 1.1), 1)
+        movey = round(random.uniform(1.9, 2.5), 1)
+        right_limit = x + 10
+        left_limit = x - 10
+    return right_limit, left_limit, movex, movey
+
+def back_snowfall():
+    global back_snow, middle_snow
+    for item in back_snow:
+        if item[0] > item[3]:
+            item[5] = -abs(item[5])
+        elif item[0] < item[4]:
+            item[5] = abs(item[5])
+        item[0] += item[5]
+        item[1] += item[6]
+        pygame.draw.circle(screen, (105, 105, 105), item[0:2], item[2])
+        if item[1] > 480:
+            item[0] = random.randrange(-10, 650)
+            item[1] = random.randrange(-480, 0)
+    for item in middle_snow:
+        if item[0] > item[3]:
+            item[5] = -abs(item[5])
+        elif item[0] < item[4]:
+            item[5] = abs(item[5])
+        item[0] += item[5]
+        item[1] += item[6]
+        pygame.draw.circle(screen, (170, 170, 170), item[0:2], item[2])
+        if item[1] > 480:
+            item[0] = random.randrange(-10, 650)
+            item[1] = random.randrange(-480, 0)
+
+def front_snowfall():
+    global front_snow
+    for item in front_snow:
+        if item[0] > item[3]:
+            item[5] = -abs(item[5])
+        elif item[0] < item[4]:
+            item[5] = abs(item[5])
+        item[0] += item[5]
+        item[1] += item[6]
+        pygame.draw.circle(screen, WHITE, item[0:2], item[2])
+        if item[1] > 480:
+            item[0] = random.randrange(-10, 650)
+            item[1] = random.randrange(-480, 0)
+
+""" 
+The goal of the game is to catch as many falling presents as possible and for each catch you get a certain amount of points, if you reach the points needed you will win the game.
+"""
+def game1():
+    moving_objs()
+    bagx = 0
+    bagy = 390
+    caught = False
+    value_appended = False
     while True:
         screen.fill(BLACK)
-        snowfall()
+        # screen.blit(background, (0, 184))
+        back_snowfall()
                 
             
         for present in present_boxes:
-            # boxhold = False
             present[2] += 1
             present[0] = screen.blit(presentbox, (present[1], present[2]))
 
-        bag = screen.blit(santabag, (100, 100))
+        bag = screen.blit(santabag, (bagx, bagy))
 
-        # for present in present_boxes:
-        #     if present[0].collidepoint((bag)):
-        #         boxhold = True
-        #     if boxhold:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            if bagx >= 2:
+                bagx -= 2
+        if keys[pygame.K_RIGHT]:
+            if bagx <= 548:
+                bagx += 2
+
+        caught = False
+        for present in present_boxes:
+            if present[0].colliderect((bag)):
+                if present[2] < bagy - 30:
+                    caught = True
+                    if not value_appended and present[-1] != True:
+                        present.append(caught)
+                        value_appended = True
+                if caught and present[-1]:
+                      present[1] = bagx + 20
+                if present[2] > 410 and present[-1]:
+                    print(present)
+                    present_boxes.remove(present)
+                    # points += 1
                 
-        # for present in present_boxes:
-        #     if grab:
-        #         present[1: ] = mx, my
+        front_snowfall()
 
-        # presentbox = pygame.draw.rect(screen, RED, [presentx, presenty, 30, 30])
-        
-
-        for item in front_snow:
-            if item[0] > item[3]:
-                item[5] = -abs(item[5])
-            elif item[0] < item[4]:
-                item[5] = abs(item[5])
-            item[0] += item[5]
-            item[1] += item[6]
-            pygame.draw.circle(screen, WHITE, item[0:2], fz)
-            if item[1] > 480:
-                item[0] = random.randrange(-10, 650)
-                item[1] = random.randrange(-480, 0)
-
-        click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
