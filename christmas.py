@@ -11,15 +11,14 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
-presentbox = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\presentbox.png")
+winter_sky = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\winter_sky.png")
+presentbox = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\presentbox.png")
 presentbox = pygame.transform.scale(presentbox, (50, 50))
-santabag = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\santabag.png")
+santabag = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\santabag.png")
 santabag = pygame.transform.scale(santabag, (90, 90))
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (155, 0, 0)
-GREEN = (0, 155, 0)
-BLUE = (0, 0, 255)
+
+FONT = pygame.font.SysFont("papyrus", 70)
 
 def moving_objs():
     global back_snow, middle_snow, front_snow, present_boxes
@@ -87,7 +86,7 @@ def back_snowfall():
         item[0] += item[5]
         item[1] += item[6]
         pygame.draw.circle(screen, (105, 105, 105), item[0:2], item[2])
-        if item[1] > 480:
+        if item[1] > 235:
             item[0] = random.randrange(-10, 650)
             item[1] = random.randrange(-480, 0)
     for item in middle_snow:
@@ -124,10 +123,11 @@ def game1():
     bagx = 0
     bagy = 390
     caught = False
-    value_appended = False
+    points = 0
     while True:
-        screen.fill(BLACK)
-        # screen.blit(background, (0, 184))
+        screen.blit(winter_sky, (0, 0))
+        text = FONT.render(str(points), True, WHITE)
+        screen.blit(text, (5, -30))
         back_snowfall()
                 
             
@@ -135,30 +135,31 @@ def game1():
             present[2] += 1
             present[0] = screen.blit(presentbox, (present[1], present[2]))
 
-        bag = screen.blit(santabag, (bagx, bagy))
+        bag = pygame.Rect([bagx+10, bagy+3, 70, 10])
+        screen.blit(santabag, (bagx, bagy))
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            if bagx >= 2:
-                bagx -= 2
+            if bagx >= 3:
+                bagx -= 3
         if keys[pygame.K_RIGHT]:
-            if bagx <= 548:
-                bagx += 2
+            if bagx <= 547:
+                bagx += 3
 
         caught = False
         for present in present_boxes:
             if present[0].colliderect((bag)):
                 if present[2] < bagy - 30:
                     caught = True
-                    if not value_appended and present[-1] != True:
-                        present.append(caught)
-                        value_appended = True
-                if caught and present[-1]:
+                    if present[-1] != True:
+                        present.append(True)
+                if caught or present[-1] == True:
                       present[1] = bagx + 20
-                if present[2] > 410 and present[-1]:
-                    print(present)
-                    present_boxes.remove(present)
-                    # points += 1
+            if present[2] > 400 and present[-1] == True:
+                present_boxes.remove(present)
+                points += 10
+            elif present[2] > 480:
+                present_boxes.remove(present)
                 
         front_snowfall()
 
