@@ -11,16 +11,16 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
-winter_sky = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\winter_sky.png")
-presentbox = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\presentbox.png")
+winter_sky = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\winter_sky.png")
+presentbox = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\presentbox.png")
 presentbox = pygame.transform.scale(presentbox, (50, 50))
-santabag = pygame.image.load("C:\\Users\\rish006\\Desktop\\ICS_Classwork\\santabag.png")
+santabag = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\santabag.png")
 santabag = pygame.transform.scale(santabag, (90, 90))
 WHITE = (255, 255, 255)
 
-FONT = pygame.font.SysFont("papyrus", 70)
+FONT = pygame.font.SysFont(None, 70)
 
-def moving_objs():
+def moving_objs(boxes):
     global back_snow, middle_snow, front_snow, present_boxes
     back_snow = []
     for i in range (150):
@@ -53,7 +53,7 @@ def moving_objs():
         f_mvx, f_mvy = snowspeed(fx, fz)[2:]
         front_snow.append([fx, fy, fz, frlimit, fllimit, f_mvx, f_mvy])
     present_boxes = []
-    for i in range(20):
+    for i in range(boxes):
         presentx = random.randrange(0, 590)
         presenty = random.randrange(-960, 0)
         present_boxes.append([None, presentx, presenty])
@@ -119,15 +119,55 @@ def front_snowfall():
 The goal of the game is to catch as many falling presents as possible and for each catch you get a certain amount of points, if you reach the points needed you will win the game.
 """
 def game1():
-    moving_objs()
+    level_state = [True, False, False, False, False]
+    lvl1, lvl2, lvl3, lvl4, lvl5 = 0, 1, 2, 3, 4
+    moving_objs(20)
     bagx = 0
     bagy = 390
     caught = False
     points = 0
+    lvl_finish = False
+    win = False
+    lose = False
     while True:
+        if len(present_boxes) == 0:
+            lvl_finish = True
+            print(lvl_finish)
+        if lvl_finish:
+            if points >= len(present_boxes)*50:
+                print(len(present_boxes)*50, points, win, lose)
+                if level_state[lvl1]:
+                    moving_objs(20)
+                    level_state[lvl1] = False
+                    level_state[lvl2] = True
+                    lvl_finish = False
+                elif level_state[lvl2]:
+                    moving_objs(22)
+                    level_state[lvl2] = False
+                    level_state[lvl3] = True
+                    lvl_finish = False
+                elif level_state[lvl3]:
+                    moving_objs(24)
+                    level_state[lvl3] = False
+                    level_state[lvl4] = True
+                    lvl_finish = False
+                elif level_state[lvl4]:
+                    moving_objs(26)
+                    level_state[lvl4] = False
+                    level_state[lvl5] = True
+                    lvl_finish = False
+                else:
+                    moving_objs(30)
+                    level_state[lvl5] = False
+                    win = True
+                    lvl_finish = False
+            else:
+                lose = True
+        
         screen.blit(winter_sky, (0, 0))
-        text = FONT.render(str(points), True, WHITE)
-        screen.blit(text, (5, -30))
+
+        points_text = FONT.render(str(points), True, WHITE)
+        screen.blit(points_text, (5, 5))
         back_snowfall()
                 
             
@@ -158,10 +198,24 @@ def game1():
             if present[2] > 400 and present[-1] == True:
                 present_boxes.remove(present)
                 points += 10
+                print(len(present_boxes), lvl_finish)
             elif present[2] > 480:
                 present_boxes.remove(present)
-                
+                print(len(present_boxes), lvl_finish)
+        
         front_snowfall()
+
+        if win:
+            screen.blit(winter_sky, (0, 0))
+            win_text = FONT.render("You Win! I'm Pagging!", True, WHITE)
+            screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
+        elif lose:
+            screen.blit(winter_sky, (0, 0))
+            win_text = FONT.render("You Lose! I'm Pagging!", True, WHITE)
+            screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
+
+            
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
