@@ -13,9 +13,9 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
-mixer.music.load("still sadge - a poem.mp3")
-mixer.music.set_volume(0.7)
-mixer.music.play(-1)
+# mixer.music.load("still_sadge_a_poem.mp3")
+# mixer.music.set_volume(0.7)
+# mixer.music.play(-1)
 winter_sky = pygame.image.load("winter_sky.png")
 presentbox = pygame.image.load("presentbox.png")
 presentbox = pygame.transform.scale(presentbox, (50, 50))
@@ -26,8 +26,10 @@ pagging = pygame.transform.scale(pagging, (100, 100))
 sadge = pygame.image.load("sadge.png")
 sadge = pygame.transform.scale(sadge, (100, 100))
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 FONT = pygame.font.SysFont(None, 70)
+TITLE_FONT = pygame.font.SysFont(None, 30)
 
 def moving_objs(boxes):
     global back_snow, middle_snow, front_snow, present_boxes, presents_num
@@ -125,9 +127,16 @@ def front_snowfall():
             item[0] = random.randrange(-10, 650)
             item[1] = random.randrange(-480, 0)
 
-""" 
-The goal of the game is to catch as many falling presents as possible and for each catch you get a certain amount of points, if you reach the points needed you will win the game.
-"""
+def intro_screen(intro):
+    if intro:
+        screen.blit(winter_sky, (0, 0))
+        description = TITLE_FONT.render("Santa keeps dropping his presents! Catch them!", True, WHITE)
+        instructions = TITLE_FONT.render("Click the left and right arrow keys to catch Santa's droppings.", True, WHITE)
+        start_title = TITLE_FONT.render("Click the left or right arrow key to start.", True, WHITE)
+        screen.blit(description, (description.get_rect(center = screen.get_rect().center)[0], description.get_rect(center = screen.get_rect().center)[1]-30))
+        screen.blit(instructions, (instructions.get_rect(center = screen.get_rect().center)[0], instructions.get_rect(center = screen.get_rect().center)[1]+30))
+        screen.blit(start_title, (start_title.get_rect(center = screen.get_rect().center)[0], start_title.get_rect(center = screen.get_rect().center)[1]))
+
 def game1():
     lvl_state = [True, False, False, False, False]
     lvl1, lvl2, lvl3, lvl4, lvl5 = 0, 1, 2, 3, 4
@@ -141,7 +150,9 @@ def game1():
     win = False
     lose = False
     lvl = 0
+    intro = True
     while True:
+
         if len(present_boxes) == 0:
             lvl_finish = True
         if lvl_finish:
@@ -199,14 +210,17 @@ def game1():
         if keys[pygame.K_LEFT]:
             if bagx >= 4:
                 bagx -= 4
+            if intro:
+                intro = False
         if keys[pygame.K_RIGHT]:
             if bagx <= 546:
                 bagx += 4
+            if intro:
+                intro = False
 
         caught = False
         for present in present_boxes:
             if present[0].colliderect((bag)):
-                print(bagy, present[2])
                 if present[2] < bagy - 45:
                     caught = True
                     if present[-1] != True:
@@ -231,7 +245,8 @@ def game1():
             win_text = FONT.render("You Lose... Sadge...", True, WHITE)
             screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
             screen.blit(sadge, (10, 10))
-
+        
+        intro_screen(intro)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
