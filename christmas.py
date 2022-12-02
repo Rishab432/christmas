@@ -206,7 +206,8 @@ def game1():
         caught = False
         for present in present_boxes:
             if present[0].colliderect((bag)):
-                if present[2] < bagy - 50:
+                print(bagy, present[2])
+                if present[2] < bagy - 45:
                     caught = True
                     if present[-1] != True:
                         present.append(True)
