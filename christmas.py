@@ -1,8 +1,10 @@
 import pygame
+from pygame import mixer
 import random
 
 pygame.init()
 pygame.font.init()
+mixer.init()
 
 WIDTH = 640
 HEIGHT = 480
@@ -11,17 +13,24 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
-winter_sky = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\winter_sky.png")
-presentbox = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\presentbox.png")
+mixer.music.load("still sadge - a poem.mp3")
+mixer.music.set_volume(0.7)
+mixer.music.play(-1)
+winter_sky = pygame.image.load("winter_sky.png")
+presentbox = pygame.image.load("presentbox.png")
 presentbox = pygame.transform.scale(presentbox, (50, 50))
-santabag = pygame.image.load("C:\\Users\\AreekkR1446\\Desktop\\ICS_Classwork\\santabag.png")
+santabag = pygame.image.load("santabag.png")
 santabag = pygame.transform.scale(santabag, (90, 90))
+pagging = pygame.image.load("pagging.gif")
+pagging = pygame.transform.scale(pagging, (100, 100))
+sadge = pygame.image.load("sadge.png")
+sadge = pygame.transform.scale(sadge, (100, 100))
 WHITE = (255, 255, 255)
 
 FONT = pygame.font.SysFont(None, 70)
 
 def moving_objs(boxes):
-    global back_snow, middle_snow, front_snow, present_boxes
+    global back_snow, middle_snow, front_snow, present_boxes, presents_num
     back_snow = []
     for i in range (150):
         bx = random.randrange(-10, 650)
@@ -57,6 +66,7 @@ def moving_objs(boxes):
         presentx = random.randrange(0, 590)
         presenty = random.randrange(-960, 0)
         present_boxes.append([None, presentx, presenty])
+    presents_num = len(present_boxes)
 
 def snowspeed(x, z):
     if z == 1:
@@ -119,9 +129,10 @@ def front_snowfall():
 The goal of the game is to catch as many falling presents as possible and for each catch you get a certain amount of points, if you reach the points needed you will win the game.
 """
 def game1():
-    level_state = [True, False, False, False, False]
+    lvl_state = [True, False, False, False, False]
     lvl1, lvl2, lvl3, lvl4, lvl5 = 0, 1, 2, 3, 4
-    moving_objs(20)
+    moving_objs(0)
+    present_fall = 1
     bagx = 0
     bagy = 390
     caught = False
@@ -129,67 +140,73 @@ def game1():
     lvl_finish = False
     win = False
     lose = False
+    lvl = 0
     while True:
         if len(present_boxes) == 0:
             lvl_finish = True
-            print(lvl_finish)
         if lvl_finish:
-            if points >= len(present_boxes)*50:
-                print(len(present_boxes)*50, points, win, lose)
-                if level_state[lvl1]:
+            if points >= presents_num*5:
+                pygame.time.wait(500)
+                lvl_finish = False
+                points = 0
+                lvl += 1
+                if lvl_state[lvl1]:
                     moving_objs(20)
-                    level_state[lvl1] = False
-                    level_state[lvl2] = True
-                    lvl_finish = False
-                elif level_state[lvl2]:
+                    lvl_state[lvl1] = False
+                    lvl_state[lvl2] = True
+                elif lvl_state[lvl2]:
                     moving_objs(22)
-                    level_state[lvl2] = False
-                    level_state[lvl3] = True
-                    lvl_finish = False
-                elif level_state[lvl3]:
+                    lvl_state[lvl2] = False
+                    lvl_state[lvl3] = True
+                elif lvl_state[lvl3]:
                     moving_objs(24)
-                    level_state[lvl3] = False
-                    level_state[lvl4] = True
-                    lvl_finish = False
-                elif level_state[lvl4]:
+                    present_fall += 0.5
+                    lvl_state[lvl3] = False
+                    lvl_state[lvl4] = True
+                elif lvl_state[lvl4]:
                     moving_objs(26)
-                    level_state[lvl4] = False
-                    level_state[lvl5] = True
-                    lvl_finish = False
-                else:
+                    lvl_state[lvl4] = False
+                    lvl_state[lvl5] = True
+                elif lvl_state[lvl5]:
                     moving_objs(30)
-                    level_state[lvl5] = False
+                    present_fall += 0.5
+                    lvl_state[lvl5] = False
+                else:
                     win = True
-                    lvl_finish = False
             else:
                 lose = True
-        
-        screen.blit(winter_sky, (0, 0))
 
+
+        screen.blit(winter_sky, (0, 0))
         points_text = FONT.render(str(points), True, WHITE)
         screen.blit(points_text, (5, 5))
+        lvl_text = FONT.render(str(lvl), True, WHITE)
+        lvltxt_rect = lvl_text.get_rect()
+        lvltxt_rect.topright = 635, 5
+        screen.blit(lvl_text, lvltxt_rect)
+
         back_snowfall()
-                
             
         for present in present_boxes:
-            present[2] += 1
+            present[2] += present_fall
             present[0] = screen.blit(presentbox, (present[1], present[2]))
+        
 
-        bag = pygame.Rect([bagx+10, bagy+3, 70, 10])
+        bag = pygame.Rect([bagx+15, bagy+3, 60, 10])
         screen.blit(santabag, (bagx, bagy))
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            if bagx >= 3:
-                bagx -= 3
+            if bagx >= 4:
+                bagx -= 4
         if keys[pygame.K_RIGHT]:
-            if bagx <= 547:
-                bagx += 3
+            if bagx <= 546:
+                bagx += 4
 
         caught = False
         for present in present_boxes:
             if present[0].colliderect((bag)):
-                if present[2] < bagy - 30:
+                if present[2] < bagy - 50:
                     caught = True
                     if present[-1] != True:
                         present.append(True)
@@ -198,10 +215,8 @@ def game1():
             if present[2] > 400 and present[-1] == True:
                 present_boxes.remove(present)
                 points += 10
-                print(len(present_boxes), lvl_finish)
             elif present[2] > 480:
                 present_boxes.remove(present)
-                print(len(present_boxes), lvl_finish)
         
         front_snowfall()
 
@@ -209,12 +224,12 @@ def game1():
             screen.blit(winter_sky, (0, 0))
             win_text = FONT.render("You Win! I'm Pagging!", True, WHITE)
             screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
+            screen.blit(pagging, (10, 10))
         elif lose:
             screen.blit(winter_sky, (0, 0))
-            win_text = FONT.render("You Lose! I'm Pagging!", True, WHITE)
+            win_text = FONT.render("You Lose... Sadge...", True, WHITE)
             screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
-
-            
+            screen.blit(sadge, (10, 10))
 
 
         for event in pygame.event.get():
