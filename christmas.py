@@ -247,8 +247,7 @@ def game():
                 screen.blit(restart_title, (restart_rect(center = screen.get_rect().center)[0]+110, restart_rect(center = screen.get_rect().center)[1]+100))
                 if restart_button.collidepoint((mx, my)):
                     if click:
-                        pass
-                        # main.main_menu()
+                        game()
             elif lose:
                 screen.blit(winter_sky, (0, 0))
                 win_text = FONT.render("You Lose... Sadge...", True, WHITE)
@@ -268,8 +267,7 @@ def game():
                 screen.blit(restart_title, (restart_rect(center = screen.get_rect().center)[0]+110, restart_rect(center = screen.get_rect().center)[1]+100))
                 if restart_button.collidepoint((mx, my)):
                     if click:
-                        pass
-                        # main.main_menu()
+                        game()
         
 
         keys = pygame.key.get_pressed()
