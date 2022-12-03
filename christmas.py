@@ -13,9 +13,9 @@ SIZE = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 
-# mixer.music.load("still_sadge_a_poem.mp3")
-# mixer.music.set_volume(0.7)
-# mixer.music.play(-1)
+mixer.music.load("Snowball Park - Super Mario 3D World.mp3")
+mixer.music.set_volume(0.5)
+mixer.music.play(-1)
 winter_sky = pygame.image.load("winter_sky.png")
 presentbox = pygame.image.load("presentbox.png")
 presentbox = pygame.transform.scale(presentbox, (50, 50))
@@ -127,17 +127,16 @@ def front_snowfall():
             item[0] = random.randrange(-10, 650)
             item[1] = random.randrange(-480, 0)
 
-def intro_screen(intro):
-    if intro:
-        screen.blit(winter_sky, (0, 0))
-        description = TITLE_FONT.render("Santa keeps dropping his presents! Catch them!", True, WHITE)
-        instructions = TITLE_FONT.render("Click the left and right arrow keys to catch Santa's droppings.", True, WHITE)
-        start_title = TITLE_FONT.render("Click the left or right arrow key to start.", True, WHITE)
-        screen.blit(description, (description.get_rect(center = screen.get_rect().center)[0], description.get_rect(center = screen.get_rect().center)[1]-30))
-        screen.blit(instructions, (instructions.get_rect(center = screen.get_rect().center)[0], instructions.get_rect(center = screen.get_rect().center)[1]+30))
-        screen.blit(start_title, (start_title.get_rect(center = screen.get_rect().center)[0], start_title.get_rect(center = screen.get_rect().center)[1]))
+def intro_screen():
+    screen.blit(winter_sky, (0, 0))
+    description = TITLE_FONT.render("Santa keeps dropping his presents! Catch them!", True, WHITE)
+    instructions = TITLE_FONT.render("Click the left and right arrow keys to catch Santa's droppings.", True, WHITE)
+    start_title = TITLE_FONT.render("Click the left or right arrow key to start.", True, WHITE)
+    screen.blit(description, (description.get_rect(center = screen.get_rect().center)[0], description.get_rect(center = screen.get_rect().center)[1]-30))
+    screen.blit(instructions, (instructions.get_rect(center = screen.get_rect().center)[0], instructions.get_rect(center = screen.get_rect().center)[1]+30))
+    screen.blit(start_title, (start_title.get_rect(center = screen.get_rect().center)[0], start_title.get_rect(center = screen.get_rect().center)[1]))
 
-def game1():
+def game():
     lvl_state = [True, False, False, False, False]
     lvl1, lvl2, lvl3, lvl4, lvl5 = 0, 1, 2, 3, 4
     moving_objs(0)
@@ -150,61 +149,128 @@ def game1():
     win = False
     lose = False
     lvl = 0
+    click = False
     intro = True
-    while True:
-
-        if len(present_boxes) == 0:
-            lvl_finish = True
-        if lvl_finish:
-            if points >= presents_num*5:
-                pygame.time.wait(500)
-                lvl_finish = False
-                points = 0
-                lvl += 1
-                if lvl_state[lvl1]:
-                    moving_objs(20)
-                    lvl_state[lvl1] = False
-                    lvl_state[lvl2] = True
-                elif lvl_state[lvl2]:
-                    moving_objs(22)
-                    lvl_state[lvl2] = False
-                    lvl_state[lvl3] = True
-                elif lvl_state[lvl3]:
-                    moving_objs(24)
-                    present_fall += 0.5
-                    lvl_state[lvl3] = False
-                    lvl_state[lvl4] = True
-                elif lvl_state[lvl4]:
-                    moving_objs(26)
-                    lvl_state[lvl4] = False
-                    lvl_state[lvl5] = True
-                elif lvl_state[lvl5]:
-                    moving_objs(30)
-                    present_fall += 0.5
-                    lvl_state[lvl5] = False
+    running = True
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        if intro:
+            intro_screen()
+        else:
+            if len(present_boxes) == 0:
+                lvl_finish = True
+            if lvl_finish:
+                if points >= presents_num*5:
+                    lvl_finish = False
+                    pygame.time.wait(1000)
+                    points = 0
+                    lvl += 1
+                    if lvl_state[lvl1]:
+                        moving_objs(20)
+                        lvl_state[lvl1] = False
+                        lvl_state[lvl2] = True
+                    elif lvl_state[lvl2]:
+                        moving_objs(22)
+                        lvl_state[lvl2] = False
+                        lvl_state[lvl3] = True
+                    elif lvl_state[lvl3]:
+                        moving_objs(24)
+                        present_fall += 0.5
+                        lvl_state[lvl3] = False
+                        lvl_state[lvl4] = True
+                    elif lvl_state[lvl4]:
+                        moving_objs(26)
+                        lvl_state[lvl4] = False
+                        lvl_state[lvl5] = True
+                    elif lvl_state[lvl5]:
+                        moving_objs(30)
+                        present_fall += 0.5
+                        lvl_state[lvl5] = False
+                    else:
+                        win = True
                 else:
-                    win = True
-            else:
-                lose = True
+                    lose = True
 
 
-        screen.blit(winter_sky, (0, 0))
-        points_text = FONT.render(str(points), True, WHITE)
-        screen.blit(points_text, (5, 5))
-        lvl_text = FONT.render(str(lvl), True, WHITE)
-        lvltxt_rect = lvl_text.get_rect()
-        lvltxt_rect.topright = 635, 5
-        screen.blit(lvl_text, lvltxt_rect)
+            screen.blit(winter_sky, (0, 0))
+            points_text = FONT.render(str(points), True, WHITE)
+            screen.blit(points_text, (5, 5))
+            lvl_text = FONT.render(str(lvl), True, WHITE)
+            lvltxt_rect = lvl_text.get_rect()
+            lvltxt_rect.topright = 635, 5
+            screen.blit(lvl_text, lvltxt_rect)
 
-        back_snowfall()
+            back_snowfall()
+                
+            for present in present_boxes:
+                present[2] += present_fall
+                present[0] = screen.blit(presentbox, (present[1], present[2]))
             
-        for present in present_boxes:
-            present[2] += present_fall
-            present[0] = screen.blit(presentbox, (present[1], present[2]))
-        
 
-        bag = pygame.Rect([bagx+15, bagy+3, 60, 10])
-        screen.blit(santabag, (bagx, bagy))
+            bag = pygame.Rect([bagx+15, bagy+3, 60, 10])
+            screen.blit(santabag, (bagx, bagy))
+
+
+            for present in present_boxes:
+                caught = False
+                if present[0].colliderect((bag)):
+                    if present[2] <= bagy - 45:
+                        caught = True
+                        if present[-1] != True:
+                            present.append(True)
+                    if caught or present[-1] == True:
+                        present[1] = bagx + 20
+                if present[2] > 400 and present[-1] == True:
+                    present_boxes.remove(present)
+                    points += 10
+                elif present[2] > 480:
+                    present_boxes.remove(present)
+            
+            front_snowfall()
+
+            if win:
+                screen.blit(winter_sky, (0, 0))
+                win_text = FONT.render("You Win! I'm Pagging!", True, WHITE)
+                screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
+                screen.blit(pagging, (10, 10))
+                menu_button = pygame.draw.rect(screen, BLACK, [110, 300, 200, 80])
+                menu_title = TITLE_FONT.render("BACK TO MENU", True, WHITE)
+                menu_rect = menu_title.get_rect
+                screen.blit(menu_title, (menu_rect(center = screen.get_rect().center)[0]-110, menu_rect(center = screen.get_rect().center)[1]+100))
+                if menu_button.collidepoint((mx, my)):
+                    if click:
+                        pass
+                        # main.main_menu()
+                restart_button = pygame.draw.rect(screen, BLACK, [330, 300, 200, 80])
+                restart_title = TITLE_FONT.render("RESTART", True, WHITE)
+                restart_rect = restart_title.get_rect
+                screen.blit(restart_title, (restart_rect(center = screen.get_rect().center)[0]+110, restart_rect(center = screen.get_rect().center)[1]+100))
+                if restart_button.collidepoint((mx, my)):
+                    if click:
+                        pass
+                        # main.main_menu()
+            elif lose:
+                screen.blit(winter_sky, (0, 0))
+                win_text = FONT.render("You Lose... Sadge...", True, WHITE)
+                screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
+                screen.blit(sadge, (10, 10))
+                menu_button = pygame.draw.rect(screen, BLACK, [110, 300, 200, 80])
+                menu_title = TITLE_FONT.render("BACK TO MENU", True, WHITE)
+                menu_rect = menu_title.get_rect
+                screen.blit(menu_title, (menu_rect(center = screen.get_rect().center)[0]-110, menu_rect(center = screen.get_rect().center)[1]+100))
+                if menu_button.collidepoint((mx, my)):
+                    if click:
+                        pass
+                        # main.main_menu()
+                restart_button = pygame.draw.rect(screen, BLACK, [330, 300, 200, 80])
+                restart_title = TITLE_FONT.render("RESTART", True, WHITE)
+                restart_rect = restart_title.get_rect
+                screen.blit(restart_title, (restart_rect(center = screen.get_rect().center)[0]+110, restart_rect(center = screen.get_rect().center)[1]+100))
+                if restart_button.collidepoint((mx, my)):
+                    if click:
+                        pass
+                        # main.main_menu()
+        
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -218,45 +284,24 @@ def game1():
             if intro:
                 intro = False
 
-        caught = False
-        for present in present_boxes:
-            if present[0].colliderect((bag)):
-                if present[2] < bagy - 45:
-                    caught = True
-                    if present[-1] != True:
-                        present.append(True)
-                if caught or present[-1] == True:
-                      present[1] = bagx + 20
-            if present[2] > 400 and present[-1] == True:
-                present_boxes.remove(present)
-                points += 10
-            elif present[2] > 480:
-                present_boxes.remove(present)
-        
-        front_snowfall()
-
-        if win:
-            screen.blit(winter_sky, (0, 0))
-            win_text = FONT.render("You Win! I'm Pagging!", True, WHITE)
-            screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
-            screen.blit(pagging, (10, 10))
-        elif lose:
-            screen.blit(winter_sky, (0, 0))
-            win_text = FONT.render("You Lose... Sadge...", True, WHITE)
-            screen.blit(win_text, (win_text.get_rect(center = screen.get_rect().center)))
-            screen.blit(sadge, (10, 10))
-        
-        intro_screen(intro)
-
+        click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                running = False
+                break
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
+                    running = False
+                    break
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
         pygame.display.update()
         clock.tick(30)
+        
+    pygame.quit()
 
+    
 if __name__ == "__main__":
-    game1()
+    game()
